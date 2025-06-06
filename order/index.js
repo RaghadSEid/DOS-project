@@ -176,7 +176,31 @@ const updateP = async (itemId,price) => {
 };
 
 
+const updateQ = async (itemId,quantity) => {
+  try {
+    const data = await fs.readFile('/catalog/catalog.csv', 'utf8'); // Change to /catalog
+    const rows = data.split('\n');
+    const header = rows[0];
+    const books = rows.slice(1).map(row => row.split(','));
 
+    const updatedBooks = books.map(book => {
+      if (parseInt(book[0]) === itemId ) {
+      //  book[3] = price; 
+		
+		book[4] = parseInt(quantity);
+      }
+      return book;
+    });
+
+    const updatedData = [header, ...updatedBooks.map(row => row.join(','))].join('\n');
+    await fs.writeFile('/catalog/catalog.csv', updatedData); // Change to /catalog
+    console.log("Catalog CSV file updated.");
+	//await loadCatalog();
+	
+  } catch (err) {
+    console.error("Error updating catalog:", err);
+  }
+};
 
 
 
