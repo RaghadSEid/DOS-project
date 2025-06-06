@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./front
+    ports:
+      - "3001:3001"
+    depends_on:
+      - catalog
+      - order
+      - catalogcash
+      - ordercash
+    networks:
+      - app-network
+
+  catalog:
+    build: ./catalog
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./catalog:/catalog  # Mount the catalog directory
+    networks:
+      - app-network
+
+  order:
+    build: ./order
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./catalog:/catalog  # Mount the same catalog directory for access
+      - ./order:/order
+    networks:
+      - app-network
+
+  catalogcash:
+    build: ./catalogcash
+    ports:
+      - "3004:3004"
+    depends_on:
+      - catalog
+      - order  
+    volumes:
+      - ./catalogcash:/catalogcash  # Mount the catalog directory
+    networks:
+      - app-network
+
+  ordercash:
+    build: ./ordercash
+    ports:
+      - "3005:3005"
+    depends_on:
+      - catalog
+      - order  
+    volumes:
+      - ./catalogcash:/catalogcash  # Mount the same catalog directory for access
+      - ./ordercash:/ordercash
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
