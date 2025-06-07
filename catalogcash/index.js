@@ -88,7 +88,17 @@ app.post('/remove_my_book/:id', (req, res) => {
 
 
 
+// Endpoint to search for books by topic
+app.get('/search/:topic', (req, res) => {
+    const topic = req.params.topic;
+    const result = catalog.filter((book) => book.topic === topic);
 
+    const size = result.length;
+    res.json(result);
+
+
+
+});
   
   
   //res.json(book || { message: "Book not found in big memory" });
