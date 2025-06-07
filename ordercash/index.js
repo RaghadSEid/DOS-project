@@ -131,6 +131,53 @@ const updateP = async (itemId,price) => {
 };
 
 
+// 📚 Endpoint: Add a new book to catalogcash.csv (and limit the file to 3 entries)
+app.post('/add_new_book', async (req, res) => {
+    const { id, title, topic, price, quantity,message } = req.body; // Destructuring directly from req.body
+
+    // Ensure all required fields are present
+   
+
+    // Format the book data as a CSV row
+    const newCsvRow = `${id},${title},${topic},${price},${quantity}`;
+
+    try {
+        // Read the current contents of the file
+        const data = await fs.readFile('/catalogcash/catalogcash.csv', 'utf8');
+
+        // Split file contents into an array of lines
+        const lines = data.split('\n');
+
+        // Insert the new row at the second line
+        lines.splice(1, 0, newCsvRow);
+
+        // Keep only the first three lines
+        if (lines.length > 3) {
+            lines.splice(3); // Remove lines from the 4th onwards
+        }
+
+        // Join the lines back into a single string
+        const updatedData = lines.join('\n');
+
+        // Write the updated contents back to catalogcash.csv
+        await fs.writeFile('/catalogcash/catalogcash.csv', updatedData);
+
+              const response3 = await axios.post(`http://catalogcash:3004/add_book`, { id, title, topic, price, quantity,message });
+
+        // Successfully added
+        res.json({ message: "Book inserted successfully, keeping only the first three entries." });
+    } catch (err) {
+        console.error("Error processing catalogcash.csv:", err);
+        return res.status(500).json({ message: "Error processing catalogcash.csv", error: err.message });
+    }
+
+
+
+
+
+});
+
+
 
 
 
