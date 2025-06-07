@@ -100,7 +100,28 @@ app.get('/search/:topic', (req, res) => {
 
 });
   
-  
+
+// Endpoint to get book information by ID
+app.get('/info/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const book = catalog.find((item) => item.id === id);
+
+
+
+    if (book) {
+        res.json({
+            id: book.id,
+            title: book.title,
+            topic: book.topic,
+            price: book.price,
+            quantity: book.quantity,
+            message: "Book from small cash"
+        });
+    } else {
+        res.json({
+            message: "Book not found in small cash"
+        });
+    }
   //res.json(book || { message: "Book not found in big memory" });
 });
 /*
