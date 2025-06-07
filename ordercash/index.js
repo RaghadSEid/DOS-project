@@ -177,7 +177,52 @@ app.post('/add_new_book', async (req, res) => {
 
 });
 
+// ❌ Endpoint: Remove a book by ID from catalogcash.csv
+app.post('/remove_book/:id', async (req, res) => {
+ // const { id } = req.body; // Expecting the book id to be passed in the request body
+  
+ const id = parseInt(req.params.id);
+  if (!id) {
+    return res.status(400).json({ message: "Book id is required" });
+  }
 
+  try {
+    // Read the current contents of catalogcash.csv
+    const data = await fs.readFile('/catalogcash/catalogcash.csv', 'utf8');
+
+    // Split the file content into lines and filter out the header
+    const lines = data.split('\n');
+    const header = lines[0]; // Keep the header row
+
+    // Filter the books, keeping only those that do not match the given id
+    const updatedLines = [header, ...lines.slice(1).filter(line => {
+      const [bookId] = line.split(',');
+      return parseInt(bookId) !== parseInt(id);
+    })];
+
+    // Check if a book was actually removed
+    if (lines.length === updatedLines.length) {
+      //return res.status(404).json({ message: "Book not found in catalogcash.csv" });
+	  
+	  res.json({ message: "Book removed successfully from catalogcash.csv" });
+    }
+
+    // Join the filtered lines back into a single CSV string
+    const updatedData = updatedLines.join('\n');
+
+    // Write the updated content back to catalogcash.csv
+    await fs.writeFile('/catalogcash/catalogcash.csv', updatedData);
+
+    // Notify any other relevant services, if necessary (e.g., if you have cache updates)/////////////////////////////////////
+    //await axios.post(`http://catalogcash:3004/remove_book`, { id });
+          const response341v = await axios.post(`http://catalogcash:3004/remove_my_book/${id}`);
+    // Respond to the client indicating success
+    res.json({ message: "Book removed successfully from catalogcash.csv" });
+  } catch (err) {
+    console.error("Error processing catalogcash.csv:", err);
+    res.status(500).json({ message: "Error processing catalogcash.csv", error: err.message });
+  }
+});
 
 
 
